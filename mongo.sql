@@ -138,3 +138,62 @@ db.student.find({
     ]
 });
 
+3. MongoDB - Aggregation and Indexing: Design and Develop MongoDB Queries using aggregation and
+indexing with suitable example using MongoDB.
+
+Create collection student{ Rollno ,Name, Class, Div, Subject,Marks, Address}and enter 6 entries or
+more. And perform the following:
+1. Find average of total marks in TOC.
+2. Find the number of students division wise.
+3. Find students of div B who scored min marks in DBMS.
+4. Find total sum of marks in SPOS of students staying pune
+5. Find the division wise count of students whose DBMS marks.
+6. Find the count of each city.
+7. Create the simple and compound Indexing on column.
+
+ans: 
+db.createCollection("student");
+
+db.student.insertMany([
+    { Rollno: 1, Name: "Amit", Class: "TE", Div: "A", Subject: "TOC", Marks: 80, Address: { city: "Pune" } },
+    { Rollno: 2, Name: "Sara", Class: "TE", Div: "B", Subject: "DBMS", Marks: 45, Address: { city: "Mumbai" } },
+    { Rollno: 3, Name: "Ravi", Class: "TE", Div: "B", Subject: "SPOS", Marks: 75, Address: { city: "Pune" } },
+    { Rollno: 4, Name: "Mona", Class: "TE", Div: "A", Subject: "DBMS", Marks: 60, Address: { city: "Nashik" } },
+    { Rollno: 5, Name: "Raj", Class: "TE", Div: "B", Subject: "TOC", Marks: 65, Address: { city: "Pune" } },
+    { Rollno: 6, Name: "Sita", Class: "TE", Div: "A", Subject: "SPOS", Marks: 85, Address: { city: "Mumbai" } }
+]);
+
+db.student.aggregate([
+    { $match: { Subject: "TOC" } },
+    { $group: { _id: "$Subject", averageMarks: { $avg: "$Marks" } } }
+]);
+
+db.student.aggregate([
+    { $group: { _id: "$Div", studentCount: { $sum: 1 } } }
+]);
+
+db.student.aggregate([
+    { $match: { Div: "B", Subject: "DBMS" } },
+    { $group: { _id: "$Div", minMarks: { $min: "$Marks" }, student: { $first: "$Name" } } }
+]);
+
+db.student.aggregate([
+    { $match: { Subject: "SPOS", "Address.city": "Pune" } },
+    { $group: { _id: null, totalMarks: { $sum: "$Marks" } } }
+]);
+
+db.student.aggregate([
+    { $match: { Subject: "DBMS" } },
+    { $group: { _id: "$Div", count: { $sum: 1 } } }
+]);
+
+db.student.aggregate([
+    { $group: { _id: "$Address.city", cityCount: { $sum: 1 } } }
+]);
+
+db.student.createIndex({ Rollno: 1 });
+
+db.student.createIndex({ Class: 1, Div: 1 });
+
+
+
